@@ -1,0 +1,107 @@
+-- Použitie našej používateľskej databázy
+USE DATABASE SNAKE_DB;
+
+-- Vytvorenie schémy pre projekt
+CREATE SCHEMA WEATHER_NEW_YORK;
+
+-- Použitie schémy pre projekt
+USE SCHEMA WEATHER_NEW_YORK;
+
+-- Nahrávanie údajov
+
+-- Vytvorenie tabuľky history_day
+CREATE TABLE history_day_staging AS SELECT
+    POSTAL_CODE,
+    COUNTRY,
+    DATE_VALID_STD,
+    MIN_TEMPERATURE_AIR_2M_C,
+    AVG_TEMPERATURE_AIR_2M_C,
+    MAX_TEMPERATURE_AIR_2M_C,
+    MIN_HUMIDITY_RELATIVE_2M_PCT,
+    AVG_HUMIDITY_RELATIVE_2M_PCT,
+    MAX_HUMIDITY_RELATIVE_2M_PCT,
+    MIN_PRESSURE_2M_MB,
+    AVG_PRESSURE_2M_MB,
+    MAX_PRESSURE_2M_MB,
+    TOT_PRECIPITATION_MM,
+    TOT_SNOWFALL_CM
+FROM SNOWPARK_FOR_PYTHON__HANDSONLAB__WEATHER_DATA_BY_PELMOREX_WEATHER_SOURCE.ONPOINT_ID.HISTORY_DAY;
+
+-- Transformácia údajov
+
+-- Vytvorenie dimenzie dim_date
+CREATE TABLE dim_date AS SELECT
+    DISTINCT DATE_VALID_STD AS dateId,
+    YEAR(DATE_VALID_STD) AS year,
+    MONTH(DATE_VALID_STD) AS month,
+    DAY(DATE_VALID_STD) AS day,
+    CASE 
+        WHEN MONTH(DATE_VALID_STD) IN (12, 1, 2) THEN 'winter'
+        WHEN MONTH(DATE_VALID_STD) IN (3, 4, 5) THEN 'spring'
+        WHEN MONTH(DATE_VALID_STD) IN (6, 7, 8) THEN 'summer'
+        WHEN MONTH(DATE_VALID_STD) IN (9, 10, 11) THEN 'autumn'
+    END AS season
+FROM history_day_staging;
+
+-- Vytvorenie dimenzie dim_location
+CREATE TABLE dim_location AS SELECT
+    DISTINCT CONCAT(COUNTRY, POSTAL_CODE) AS locationId,
+    POSTAL_CODE,
+    COUNTRY
+FROM history_day_staging;
+
+-- Vytvorenie dimenzie dim_temperature
+CREATE TABLE dim_temperature AS SELECT
+    DISTINCT CONCAT(MIN_TEMPERATURE_AIR_2M_C, AVG_TEMPERATURE_AIR_2M_C, MAX_TEMPERATURE_AIR_2M_C) AS temperatureId,
+    MIN_TEMPERATURE_AIR_2M_C AS min,
+    AVG_TEMPERATURE_AIR_2M_C AS avg,
+    MAX_TEMPERATURE_AIR_2M_C AS max
+FROM history_day_staging;
+
+-- Vytvorenie dimenzie dim_humidity
+CREATE TABLE dim_humidity AS SELECT
+    DISTINCT CONCAT(MIN_HUMIDITY_RELATIVE_2M_PCT, AVG_HUMIDITY_RELATIVE_2M_PCT, MAX_HUMIDITY_RELATIVE_2M_PCT) AS humidityId,
+    MIN_HUMIDITY_RELATIVE_2M_PCT AS min,
+    AVG_HUMIDITY_RELATIVE_2M_PCT AS avg,
+    MAX_HUMIDITY_RELATIVE_2M_PCT AS max,
+FROM history_day_staging;
+
+-- Vytvorenie dimenzie_dim_pressure
+CREATE TABLE dim_pressure AS SELECT
+    DISTINCT CONCAT(MIN_PRESSURE_2M_MB, AVG_PRESSURE_2M_MB, MAX_PRESSURE_2M_MB) AS pressureId,
+    MIN_PRESSURE_2M_MB AS min,
+    AVG_PRESSURE_2M_MB AS avg,
+    MAX_PRESSURE_2M_MB AS max,
+FROM history_day_staging;
+
+-- Vytvorenie dimenzie dim_precipitation
+CREATE TABLE dim_precipitation AS SELECT
+    DISTINCT CONCAT(TOT_PRECIPITATION_MM, TOT_SNOWFALL_CM) AS precipitationId,
+    TOT_PRECIPITATION_MM AS total,
+    TOT_SNOWFALL_CM AS snowfall
+FROM history_day_staging;
+
+-- Vytvorenie tabuľky faktov facts_measurement
+CREATE TABLE facts_measurement AS SELECT
+    ROW_NUMBER() OVER (ORDER BY DATE_VALID_STD) AS measurementId,
+    DATE_VALID_STD AS dateId,
+    CONCAT(COUNTRY, POSTAL_CODE) AS locationId,
+    CONCAT(MIN_TEMPERATURE_AIR_2M_C, AVG_TEMPERATURE_AIR_2M_C, MAX_TEMPERATURE_AIR_2M_C) AS temperatureId,
+    CONCAT(MIN_HUMIDITY_RELATIVE_2M_PCT, AVG_HUMIDITY_RELATIVE_2M_PCT, MAX_HUMIDITY_RELATIVE_2M_PCT) AS humidityId,
+    CONCAT(MIN_PRESSURE_2M_MB, AVG_PRESSURE_2M_MB, MAX_PRESSURE_2M_MB) AS pressureId,
+    CONCAT(TOT_PRECIPITATION_MM, TOT_SNOWFALL_CM) AS precipitationId,
+
+    TOT_PRECIPITATION_MM - AVG(TOT_PRECIPITATION_MM) OVER (
+        PARTITION BY locationId
+        ORDER BY DATE_VALID_STD ASC
+        RANGE BETWEEN INTERVAL '30 DAYS' PRECEDING AND CURRENT ROW
+    ) AS precipitationDiffFromAvg30,
+    AVG_PRESSURE_2M_MB - AVG(AVG_PRESSURE_2M_MB) OVER (
+        PARTITION BY locationId
+        ORDER BY DATE_VALID_STD ASC
+        RANGE BETWEEN INTERVAL '30 DAYS' PRECEDING AND CURRENT ROW
+    ) AS pressureDiffFromAvg30
+FROM history_day_staging;
+
+-- DROPnutie staging tabuľky
+DROP TABLE IF EXISTS history_day_staging;
