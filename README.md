@@ -199,6 +199,8 @@ GROUP BY year;
 
 ### Graf 2: Najvyššia priemerná teplota pre každé ročné obdobie
 
+Táto vizualizácia zobrazuje najvyššiu priemernú teplotu pre každé ročné obdobie. Umožňuje získať prehľad o priemernej teplote ročného obdobia, ktorú možno očakávať. Môže byť užitočná pri plánovaní pracovných a voľnočasových aktivít.
+
 ```
 SELECT season, MAX(avg) AS max_per_season FROM facts_measurement f
 JOIN dim_temperature t ON f.temperatureid = t.temperatureid
@@ -228,6 +230,8 @@ ORDER BY year ASC;
 ```
 
 ### Graf 4: Rebríček teplotných rozdielov pre najnižšiu a najvyššiu teplotu v každom ročnom období
+
+Graf znázorňuje rebríček teplotných rozdielov pre ročné obdobia s porovnaním teplotných extrémov pre každé ročné obdobie a identifikovať teplotnú variabilitu ročných období. Vizualizácia je užitočná pri analýze teplotnej stability a ukazuje premenlivosť počasia v danom období.
 
 ```
 WITH season_temp_intervals AS (
@@ -297,6 +301,8 @@ GROUP BY year;
 
 ### Graf 8: Celková ročná pravdepodobnosť zrážok
 
+Tabuľka znázorňuje pravdepodobnosť dňa so zrážkami, pričom vychádza z historických dát. Pravdepodobnosť sa počíta pre každý rok. Počíta sa ako podiel počtu dní, pri ktorých boli namerané zrážky, delené celkovým počtom meraní v danom roku. Výsledok podielu je ešte prenásobený stom. Je užitočný pre porovnanie zrážkovej činnosti pre merané roky.
+
 ```
 WITH measurements AS (
     SELECT
@@ -319,6 +325,8 @@ SELECT year, precipitation_probability FROM measurements;
 
 ### Graf 9: Priemerné množstvo snehu v zime podľa rokov
 
+Tento bodový graf znázorňuje priemerné množstvo napadnutého snehu v zime v jednotlivých rokoch. Pomáha sledovať medziročné výkyvy ako sa menila snehová pokrývka v priebehu rokov.
+
 ```
 SELECT year, AVG(snowfall) AS average_snowfall FROM facts_measurement f
 JOIN dim_date d ON f.dateid = d.dateid
@@ -329,6 +337,8 @@ ORDER BY year;
 ```
 
 ### Graf 10: Priemerná medziročná teplota
+
+Vizualizácia znázorňuje priemernú medziročnú teplotu pre jednotlivé roky s rebríčkom ohodnotenia podľa priemeru. Každému roku je priradené poradie začínajúc od najmenšej priemernej teploty po najvyššiu pre každý rok. Umožňuje sledovanie dlhodobých trendov v teplotách.
 
 ```
 WITH cte AS (
