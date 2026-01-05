@@ -11,7 +11,7 @@ Dáta sú v datasete poskytované skrze dve tabuľky:
 
 Vzhľadom na účel projektu sme pracovali iba s tabuľkou `history_day`, ktorá má nasledujúci formát:
 
-// odkaz na obrázok tabuľky
+![ERD schéma tabuľky history_day](img/erd_schema.jpeg)
 
 ## Dimenzionálny model
 
@@ -26,7 +26,7 @@ Dáta boli spracované podľa hviezdicovej schémy (star schémy) ktorá obsahuj
 
 Vzájoné prepojenie tabuliek je vizuálne znázornené na tomto entitno-relačnom diagrame:
 
-// odkaz na obrázok star schémy
+![Star schéma návrhu dimenzií](img/star_schema.jpeg)
 
 ## ELT proces v Snowflake
 
