@@ -186,6 +186,8 @@ Dashboard obsahuje 10 vizualizácií ktoré zobrazujú najrôznejšie metriky o 
 
 ### Graf 1: Množstvo tropických dní v lete
 
+Táto vizualizácia zobrazuje percento tropických dní z leta v jednotlivých rokoch. Za tropický deň sa považuje deň v ktorom maximálna teplota vystúpi na 30 stupňov. Táto metrika umožňuje ľahko uvidieť nakoľko horúce letá v new yorku bývajú.
+
 ```
 SELECT d.year AS year, FLOOR(100 * COUNT(*) / 92) AS percent_of_tropical_days
 FROM facts_measurement m
@@ -205,6 +207,8 @@ GROUP BY season;
 ```
 
 ### Graf 3: Posledný jarný mráz
+
+Táto vizualizácia zobrazuje dátum a silu posledného mrazu na jar. Táto metrika je veľmi dôležitá pre ľudí ktorí pestujú nejaké rastliny, nakoľko podľa nej môžu určiť od ktorého dátumu im už podľa všetkého nezamrznú.
 
 ```
 SELECT date, tmin
@@ -241,6 +245,8 @@ FROM season_temp_intervals;
 
 ### Graf 5: Korelácia tlaku a teploty v zime
 
+Táto vizualizácia skúma vzájomné pôsobenie teploty a tlaku. Na Slovensku v zime nižší tlak znamená v priemere zvýšenie dennej teploty, a vyšší tlak naopak zníženie dennej teploty. Vizualizácia dáva do pomeru tieto dva údaje v New Yorku a zisťuje, že tam je to rovnako. Táto metrika umožňuje v zime jednoduchšie predpovedať počasie podľa tendencie tlaku.
+
 ```
 SELECT p.avg AS pressure, AVG(t.avg) AS temperature
 FROM facts_measurement m
@@ -254,6 +260,8 @@ ORDER BY p.avg ASC;
 
 ### Graf 6: Porovnanie priemerných zrážok a vlhkosti
 
+Táto vizualizácia zobrazuje priemerné zrážky a vlhkosť za rok. Jej cieľom je skúmať či existuje nejaká korelácia medzi množstvom zrážok a vlhkosťou vzduchu.
+
 ```
 SELECT d.year AS year, AVG(p.total) AS precipitation, AVG(h.avg) AS humidity
 FROM facts_measurement m
@@ -265,6 +273,8 @@ ORDER BY humidity ASC;
 ```
 
 ### Graf 7: Medardova kvapka
+
+Táto vizualizácia zobrazuje roky v ktorých na Medarda (8 jún) pršalo, a v koľkých nasledujúcich 40 dňoch sa vyskytli nejaké zrážky. Jedná sa o testovanie slovenského príslovia "Medardova kvapka štyridsať dní kvapká".
 
 ```
 WITH years_with_precipitation_on_medard AS (
@@ -331,3 +341,5 @@ SELECT *, ROW_NUMBER() OVER (
     ORDER BY average
 ) AS ranking FROM cte;
 ```
+
+**Autori:** Vendelín Slezák, Pavol Marko
