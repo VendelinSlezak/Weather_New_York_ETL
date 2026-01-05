@@ -186,7 +186,7 @@ Dashboard obsahuje 10 vizualizácií ktoré zobrazujú najrôznejšie metriky o 
 
 ### Graf 1: Množstvo tropických dní v lete
 
-Táto vizualizácia zobrazuje percento tropických dní z leta v jednotlivých rokoch. Za tropický deň sa považuje deň v ktorom maximálna teplota vystúpi na 30 stupňov. Táto metrika umožňuje ľahko uvidieť nakoľko horúce letá v new yorku bývajú.
+Táto vizualizácia zobrazuje percento tropických dní z leta v jednotlivých rokoch. Za tropický deň sa považuje deň v ktorom maximálna teplota vystúpi na 30 stupňov. Z výstupov je zremé, že tropické dni v New Yorku zvyknú pokrývať cca jednu tretinu leta.
 
 ```
 SELECT d.year AS year, FLOOR(100 * COUNT(*) / 92) AS percent_of_tropical_days
@@ -208,7 +208,7 @@ GROUP BY season;
 
 ### Graf 3: Posledný jarný mráz
 
-Táto vizualizácia zobrazuje dátum a silu posledného mrazu na jar. Táto metrika je veľmi dôležitá pre ľudí ktorí pestujú nejaké rastliny, nakoľko podľa nej môžu určiť od ktorého dátumu im už podľa všetkého nezamrznú.
+Táto vizualizácia zobrazuje dátum a silu posledného mrazu na jar. Táto metrika je veľmi dôležitá pre ľudí ktorí pestujú nejaké rastliny, nakoľko podľa nej môžu určiť od ktorého dátumu im už podľa všetkého nezamrznú. Z výstupov môžeme vidieť, že posledné mrazy zvyknu bývať na začiatku apríla. Nie je teda potrebné sa obávať ešte v máji "troch zmrzlíkov" ako je to na Slovensku.
 
 ```
 SELECT date, tmin
@@ -260,7 +260,7 @@ ORDER BY p.avg ASC;
 
 ### Graf 6: Porovnanie priemerných zrážok a vlhkosti
 
-Táto vizualizácia zobrazuje priemerné zrážky a vlhkosť za rok. Jej cieľom je skúmať či existuje nejaká korelácia medzi množstvom zrážok a vlhkosťou vzduchu.
+Táto vizualizácia zobrazuje priemerné zrážky a vlhkosť za rok. Jej cieľom je skúmať či existuje nejaká korelácia medzi množstvom zrážok a vlhkosťou vzduchu. Vo výsledku môžeme vidieť, že táto korelácia je minimálna. Ukazuje to, že priame zrážky sami o sebe nie sú jediným meradlom pre vlhkosť vzduchu.
 
 ```
 SELECT d.year AS year, AVG(p.total) AS precipitation, AVG(h.avg) AS humidity
@@ -274,7 +274,7 @@ ORDER BY humidity ASC;
 
 ### Graf 7: Medardova kvapka
 
-Táto vizualizácia zobrazuje roky v ktorých na Medarda (8 jún) pršalo, a v koľkých nasledujúcich 40 dňoch sa vyskytli nejaké zrážky. Jedná sa o testovanie slovenského príslovia "Medardova kvapka štyridsať dní kvapká".
+Táto vizualizácia zobrazuje roky v ktorých na Medarda (8 jún) pršalo, a v koľkých nasledujúcich 40 dňoch sa vyskytli nejaké zrážky. Jedná sa o testovanie slovenského príslovia "Medardova kvapka štyridsať dní kvapká". Vo vizualizácií môžeme vidieť, že v rokoch kedy v New Yorku na Medarka pršalo v nasledujúcich 40 dňoch zvyklo pršať asi v polovici. Nejedná sa teda o úplne doslovné splnenie slovenského príslovia, ale dá sa predpokladať, že pršanie v čase Medarda je spojené s celkovým vlhkejším obdobím.
 
 ```
 WITH years_with_precipitation_on_medard AS (
